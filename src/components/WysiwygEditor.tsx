@@ -177,6 +177,7 @@ export const WysiwygEditor = ({ value, onChange, placeholder }: WysiwygEditorPro
           value={htmlValue}
           onChange={(e) => handleHtmlChange(e.target.value)}
           className="w-full h-40 p-3 font-mono text-sm border-0 resize-none focus:outline-none"
+          style={{ direction: 'ltr' }}
           placeholder="Enter HTML code..."
         />
       ) : (
@@ -186,7 +187,12 @@ export const WysiwygEditor = ({ value, onChange, placeholder }: WysiwygEditorPro
           onInput={updateContent}
           onBlur={updateContent}
           className="min-h-[160px] p-3 focus:outline-none"
-          style={{ wordBreak: 'break-word' }}
+          style={{ 
+            wordBreak: 'break-word',
+            direction: 'ltr',
+            textAlign: 'left',
+            unicodeBidi: 'embed'
+          }}
           dangerouslySetInnerHTML={{ __html: value }}
         />
       )}
