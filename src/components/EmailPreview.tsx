@@ -26,17 +26,20 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
       .filter(field => field.type === 'toggle')
       .forEach(toggleField => {
         const isEnabled = toggleField.value === 'true';
-        const sectionToken = `{{${toggleField.id.toUpperCase().replace('-', '_')}}}`;
+        const sectionId = toggleField.controlsSection?.toUpperCase().replace('-', '_');
         
-        // Handle Handlebars-style conditionals
-        const conditionalPattern = new RegExp(
-          `{{#${sectionToken}}}([\\s\\S]*?){{/${sectionToken}}}`,
-          'g'
-        );
-        
-        html = html.replace(conditionalPattern, (match, content) => {
-          return isEnabled ? content : '';
-        });
+        if (sectionId) {
+          // Handle Handlebars-style conditionals
+          const conditionalPattern = new RegExp(
+            `{{#${toggleField.id.toUpperCase().replace('-', '_')}}}([\\s\\S]*?){{/${toggleField.id.toUpperCase().replace('-', '_')}}}`,
+            'g'
+          );
+          
+          html = html.replace(conditionalPattern, (match, content) => {
+            console.log(`Toggle ${toggleField.id} is ${isEnabled ? 'enabled' : 'disabled'}`);
+            return isEnabled ? content : '';
+          });
+        }
       });
     
     // Replace any remaining common tokens

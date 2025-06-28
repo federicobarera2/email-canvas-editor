@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,19 +40,6 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
       case 'toggle': return <ToggleLeft className="h-4 w-4" />;
       default: return <Type className="h-4 w-4" />;
     }
-  };
-
-  const isFieldVisible = (field: TemplateField) => {
-    // Check if this field should be hidden based on toggle state
-    const controllingToggle = templateData.fields.find(f => 
-      f.type === 'toggle' && f.controlsSection === field.id
-    );
-    
-    if (controllingToggle) {
-      return controllingToggle.value === 'true';
-    }
-    
-    return true;
   };
 
   const renderField = (field: TemplateField) => {
@@ -130,7 +118,7 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
     }
   };
 
-  // Get fields for the current active section
+  // Get fields for the current active section - show ALL fields in the UI
   const currentSectionFields = templateData.fields.filter(field => field.section === activeSection);
 
   return (
@@ -154,7 +142,7 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
             {sections.map((section) => (
               <TabsContent key={section} value={section} className="space-y-4">
                 {templateData.fields
-                  .filter(field => field.section === section && isFieldVisible(field))
+                  .filter(field => field.section === section)
                   .map((field) => (
                     <Card key={field.id} className="shadow-sm">
                       <CardHeader className="pb-3">
@@ -182,9 +170,7 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
           </Tabs>
         ) : (
           <div className="space-y-4">
-            {currentSectionFields
-              .filter(field => isFieldVisible(field))
-              .map((field) => (
+            {currentSectionFields.map((field) => (
               <Card key={field.id} className="shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
