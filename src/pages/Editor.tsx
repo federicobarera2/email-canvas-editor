@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, Send, Eye } from "lucide-react";
+import { ArrowLeft, Save, Send } from "lucide-react";
 import { ControlPanel } from "@/components/ControlPanel";
 import { EmailPreview } from "@/components/EmailPreview";
 import { getTemplateById, TemplateData } from "@/lib/templateData";
@@ -30,11 +30,6 @@ const Editor = () => {
   const handleSave = () => {
     console.log("Saving template:", templateData);
     // Save functionality would be implemented here
-  };
-
-  const handlePreview = () => {
-    console.log("Opening preview:", templateData);
-    // Preview functionality would be implemented here
   };
 
   const handleSend = () => {
@@ -89,10 +84,6 @@ const Editor = () => {
             </div>
             
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={handlePreview}>
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
               <Button variant="outline" onClick={handleSave}>
                 <Save className="h-4 w-4 mr-2" />
                 Save
