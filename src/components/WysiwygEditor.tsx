@@ -17,8 +17,33 @@ export const WysiwygEditor = ({ value, onChange, placeholder }: WysiwygEditorPro
 
   useEffect(() => {
     setHtmlValue(value);
-    if (editorRef.current && !showHtml) {
+    if (editorRef.current && !showHtml && editorRef.current.innerHTML !== value) {
+      // Only update if content is actually different to avoid cursor jumps
+      const selection = window.getSelection();
+      const range = selection?.getRangeAt(0);
+      const startOffset = range?.startOffset;
+      const endOffset = range?.endOffset;
+      const startContainer = range?.startContainer;
+      
       editorRef.current.innerHTML = value;
+      
+      // Restore cursor position if possible
+      if (selection && range && startContainer && editorRef.current.contains(startContainer)) {
+        try {
+          const newRange = document.createRange();
+          newRange.setStart(startContainer, Math.min(startOffset || 0, startContainer.textContent?.length || 0));
+          newRange.setEnd(startContainer, Math.min(endOffset || 0, startContainer.textContent?.length || 0));
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        } catch (e) {
+          // If cursor restoration fails, just place it at the end
+          const newRange = document.createRange();
+          newRange.selectNodeContents(editorRef.current);
+          newRange.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        }
+      }
     }
   }, [value, showHtml]);
 
@@ -193,7 +218,7 @@ export const WysiwygEditor = ({ value, onChange, placeholder }: WysiwygEditorPro
             textAlign: 'left',
             unicodeBidi: 'embed'
           }}
-          dangerouslySetInnerHTML={{ __html: value }}
+          suppressContentEditableWarning={true}
         />
       )}
     </div>
