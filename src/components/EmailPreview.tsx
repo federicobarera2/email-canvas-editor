@@ -27,14 +27,6 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
     return html;
   }, [templateData]);
 
-  const getPreviewWidth = () => {
-    return viewMode === "mobile" ? "375px" : "100%";
-  };
-
-  const getPreviewMaxWidth = () => {
-    return viewMode === "mobile" ? "375px" : "2xl";
-  };
-
   return (
     <div className="h-full flex flex-col">
       {/* Preview Header */}
@@ -64,9 +56,9 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
 
       {/* Preview Content */}
       <div className="flex-1 p-6 bg-gray-100">
-        <div className={`mx-auto ${viewMode === "mobile" ? "" : "max-w-2xl"}`} style={{ width: getPreviewWidth() }}>
+        <div className={`mx-auto ${viewMode === "mobile" ? "w-[375px]" : "max-w-2xl w-full"}`}>
           {/* Email Client Mockup */}
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ maxWidth: getPreviewMaxWidth() }}>
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden w-full">
             {/* Mock Email Header */}
             <div className="bg-gray-50 px-4 py-3 border-b text-sm text-gray-600">
               <div className="flex items-center justify-between mb-1">
