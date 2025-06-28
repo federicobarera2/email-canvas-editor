@@ -21,6 +21,24 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
       html = html.replace(new RegExp(token, 'g'), field.value);
     });
     
+    // Handle conditional sections (toggle fields)
+    templateData.fields
+      .filter(field => field.type === 'toggle')
+      .forEach(toggleField => {
+        const isEnabled = toggleField.value === 'true';
+        const sectionToken = `{{${toggleField.id.toUpperCase().replace('-', '_')}}}`;
+        
+        // Handle Handlebars-style conditionals
+        const conditionalPattern = new RegExp(
+          `{{#${sectionToken}}}([\\s\\S]*?){{/${sectionToken}}}`,
+          'g'
+        );
+        
+        html = html.replace(conditionalPattern, (match, content) => {
+          return isEnabled ? content : '';
+        });
+      });
+    
     // Replace any remaining common tokens
     html = html.replace(/{{TITLE}}/g, templateData.name);
     
@@ -91,6 +109,7 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
             <ul className="text-xs text-blue-800 space-y-1">
               <li>• This preview shows how your email will appear to recipients</li>
               <li>• Changes made in the control panel will update this preview in real-time</li>
+              <li>• Use toggles to show/hide optional content sections</li>
               <li>• Use the "Send Test" button to see how it looks in actual email clients</li>
               {viewMode === "mobile" && (
                 <li>• Mobile view simulates a 375px width typical of smartphones</li>

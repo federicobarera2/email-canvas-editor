@@ -1,13 +1,13 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WysiwygEditor } from "@/components/WysiwygEditor";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { TemplateData, TemplateField } from "@/lib/templateData";
-import { Image, Link, Type, Code } from "lucide-react";
+import { Image, Link, Type, Code, ToggleLeft } from "lucide-react";
 
 interface ControlPanelProps {
   templateData: TemplateData;
@@ -36,8 +36,22 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
       case 'link': return <Link className="h-4 w-4" />;
       case 'wysiwyg': return <Code className="h-4 w-4" />;
       case 'html': return <Code className="h-4 w-4" />;
+      case 'toggle': return <ToggleLeft className="h-4 w-4" />;
       default: return <Type className="h-4 w-4" />;
     }
+  };
+
+  const isFieldVisible = (field: TemplateField) => {
+    // Check if this field should be hidden based on toggle state
+    const controllingToggle = templateData.fields.find(f => 
+      f.type === 'toggle' && f.controlsSection === field.id
+    );
+    
+    if (controllingToggle) {
+      return controllingToggle.value === 'true';
+    }
+    
+    return true;
   };
 
   const renderField = (field: TemplateField) => {
@@ -48,6 +62,18 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
     };
 
     switch (field.type) {
+      case 'toggle':
+        return (
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={field.value === 'true'}
+              onCheckedChange={(checked) => handleFieldUpdate(field.id, checked ? 'true' : 'false')}
+            />
+            <Label className="text-sm text-gray-600">
+              {field.value === 'true' ? 'Enabled' : 'Disabled'}
+            </Label>
+          </div>
+        );
       case 'wysiwyg':
         return (
           <ErrorBoundary key={`${field.id}-${activeSection}`}>
@@ -128,7 +154,7 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
             {sections.map((section) => (
               <TabsContent key={section} value={section} className="space-y-4">
                 {templateData.fields
-                  .filter(field => field.section === section)
+                  .filter(field => field.section === section && isFieldVisible(field))
                   .map((field) => (
                     <Card key={field.id} className="shadow-sm">
                       <CardHeader className="pb-3">
@@ -143,7 +169,8 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
                             htmlFor={field.id} 
                             className="text-xs text-gray-600 uppercase tracking-wide"
                           >
-                            {field.type === 'wysiwyg' ? 'Rich Text Editor' : field.type}
+                            {field.type === 'wysiwyg' ? 'Rich Text Editor' : 
+                             field.type === 'toggle' ? 'Section Toggle' : field.type}
                           </Label>
                           {renderField(field)}
                         </div>
@@ -155,7 +182,9 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
           </Tabs>
         ) : (
           <div className="space-y-4">
-            {currentSectionFields.map((field) => (
+            {currentSectionFields
+              .filter(field => isFieldVisible(field))
+              .map((field) => (
               <Card key={field.id} className="shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -169,7 +198,8 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
                       htmlFor={field.id} 
                       className="text-xs text-gray-600 uppercase tracking-wide"
                     >
-                      {field.type === 'wysiwyg' ? 'Rich Text Editor' : field.type}
+                      {field.type === 'wysiwyg' ? 'Rich Text Editor' : 
+                       field.type === 'toggle' ? 'Section Toggle' : field.type}
                     </Label>
                     {renderField(field)}
                   </div>

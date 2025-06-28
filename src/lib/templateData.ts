@@ -1,11 +1,11 @@
-
 export interface TemplateField {
   id: string;
   label: string;
-  type: 'text' | 'image' | 'link' | 'html' | 'wysiwyg';
+  type: 'text' | 'image' | 'link' | 'html' | 'wysiwyg' | 'toggle';
   value: string;
   placeholder?: string;
   section: string;
+  controlsSection?: string; // New field to specify which section this toggle controls
 }
 
 export interface TemplateData {
@@ -45,6 +45,21 @@ const templates: Record<string, TemplateData> = {
         section: "Content"
       },
       {
+        id: "show-optional-section",
+        label: "Show Optional Section",
+        type: "toggle",
+        value: "true",
+        section: "Content",
+        controlsSection: "optional-content"
+      },
+      {
+        id: "optional-content",
+        label: "Optional Content Block",
+        type: "wysiwyg",
+        value: "<h3>Additional Information</h3><p>This is an optional content section that can be toggled on or off. Use this space for additional details, announcements, or special offers.</p>",
+        section: "Content"
+      },
+      {
         id: "footer-content",
         label: "Footer Content",
         type: "wysiwyg",
@@ -65,6 +80,7 @@ const templates: Record<string, TemplateData> = {
           .header { text-align: center; padding: 20px; }
           .header img { max-width: 100%; height: auto; border-radius: 8px; }
           .content { padding: 30px; line-height: 1.6; color: #333; }
+          .optional-section { margin-top: 30px; padding-top: 30px; border-top: 1px solid #eee; }
           .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
           .footer a { color: #007bff; text-decoration: none; }
         </style>
@@ -78,6 +94,11 @@ const templates: Record<string, TemplateData> = {
           </div>
           <div class="content">
             {{MAIN_CONTENT}}
+            {{#SHOW_OPTIONAL_SECTION}}
+            <div class="optional-section">
+              {{OPTIONAL_CONTENT}}
+            </div>
+            {{/SHOW_OPTIONAL_SECTION}}
           </div>
           <div class="footer">
             {{FOOTER_CONTENT}}
@@ -115,6 +136,21 @@ const templates: Record<string, TemplateData> = {
         section: "Content"
       },
       {
+        id: "show-bonus-section",
+        label: "Show Bonus Offer",
+        type: "toggle",
+        value: "true",
+        section: "Content",
+        controlsSection: "bonus-content"
+      },
+      {
+        id: "bonus-content",
+        label: "Bonus Offer Content",
+        type: "wysiwyg",
+        value: "<h2 style='color: #27ae60; text-align: center;'>Bonus Offer!</h2><p style='text-align: center;'>Get an additional 15% off when you spend over $100. Use code: BONUS15</p>",
+        section: "Content"
+      },
+      {
         id: "footer-promo",
         label: "Footer",
         type: "wysiwyg",
@@ -135,6 +171,7 @@ const templates: Record<string, TemplateData> = {
           .hero { position: relative; text-align: center; }
           .hero img { width: 100%; height: auto; }
           .content { padding: 30px; }
+          .bonus-section { margin-top: 30px; padding: 20px; background-color: #f0f8ff; border-radius: 8px; }
           .footer { background-color: #2c3e50; color: white; padding: 20px; text-align: center; }
           .footer a { color: #3498db; }
         </style>
@@ -148,6 +185,11 @@ const templates: Record<string, TemplateData> = {
           </div>
           <div class="content">
             {{PROMOTIONAL_CONTENT}}
+            {{#SHOW_BONUS_SECTION}}
+            <div class="bonus-section">
+              {{BONUS_CONTENT}}
+            </div>
+            {{/SHOW_BONUS_SECTION}}
           </div>
           <div class="footer">
             {{FOOTER_PROMO}}
@@ -185,6 +227,21 @@ const templates: Record<string, TemplateData> = {
         section: "Content"
       },
       {
+        id: "show-getting-started",
+        label: "Show Getting Started Guide",
+        type: "toggle",
+        value: "true",
+        section: "Content",
+        controlsSection: "getting-started"
+      },
+      {
+        id: "getting-started",
+        label: "Getting Started Guide",
+        type: "wysiwyg",
+        value: "<h2 style='color: #3498db;'>Getting Started</h2><p>Here are some quick steps to help you get the most out of your membership:</p><ol><li>Complete your profile setup</li><li>Explore our resource library</li><li>Join our community discussions</li><li>Follow us on social media</li></ol>",
+        section: "Content"
+      },
+      {
         id: "welcome-footer",
         label: "Footer Message",
         type: "wysiwyg",
@@ -205,6 +262,7 @@ const templates: Record<string, TemplateData> = {
           .header { text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
           .header img { max-width: 100%; height: auto; border-radius: 8px; }
           .content { padding: 40px 30px; line-height: 1.7; color: #444; }
+          .getting-started-section { margin-top: 30px; padding: 25px; background-color: #e8f4fd; border-left: 4px solid #3498db; }
           .footer { background-color: #2ecc71; color: white; padding: 25px; text-align: center; }
         </style>
       </head>
@@ -217,6 +275,11 @@ const templates: Record<string, TemplateData> = {
           </div>
           <div class="content">
             {{WELCOME_MESSAGE}}
+            {{#SHOW_GETTING_STARTED}}
+            <div class="getting-started-section">
+              {{GETTING_STARTED}}
+            </div>
+            {{/SHOW_GETTING_STARTED}}
           </div>
           <div class="footer">
             {{WELCOME_FOOTER}}
