@@ -18,6 +18,10 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
   const sections = Array.from(new Set(templateData.fields.map(field => field.section)));
   const [activeSection, setActiveSection] = useState(sections[0] || "Content");
 
+  console.log("Available sections:", sections);
+  console.log("Active section:", activeSection);
+  console.log("Template fields:", templateData.fields);
+
   const handleFieldUpdate = (fieldId: string, value: string) => {
     const updatedFields = templateData.fields.map(field =>
       field.id === fieldId ? { ...field, value } : field
@@ -97,6 +101,9 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
     }
   };
 
+  // Get fields for the current active section
+  const currentSectionFields = templateData.fields.filter(field => field.section === activeSection);
+
   return (
     <div className="h-full flex flex-col">
       <div className="p-6 border-b">
@@ -105,43 +112,69 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
       </div>
 
       <div className="flex-1 p-6">
-        <Tabs value={activeSection} onValueChange={setActiveSection}>
-          <TabsList className={`grid w-full mb-6 ${sections.length === 2 ? 'grid-cols-2' : sections.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
-            {sections.map((section) => (
-              <TabsTrigger key={section} value={section} className="text-xs">
-                {section}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        {sections.length > 1 ? (
+          <Tabs value={activeSection} onValueChange={setActiveSection}>
+            <TabsList className={`grid w-full mb-6 ${sections.length === 2 ? 'grid-cols-2' : sections.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
+              {sections.map((section) => (
+                <TabsTrigger key={section} value={section} className="text-xs">
+                  {section}
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
-          {sections.map((section) => (
-            <TabsContent key={section} value={section} className="space-y-4">
-              {templateData.fields
-                .filter(field => field.section === section)
-                .map((field) => (
-                  <Card key={field.id} className="shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        {getFieldIcon(field.type)}
-                        {field.label}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="space-y-2">
-                        <Label 
-                          htmlFor={field.id} 
-                          className="text-xs text-gray-600 uppercase tracking-wide"
-                        >
-                          {field.type === 'wysiwyg' ? 'Rich Text Editor' : field.type}
-                        </Label>
-                        {renderField(field)}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </TabsContent>
-          ))}
-        </Tabs>
+            {sections.map((section) => (
+              <TabsContent key={section} value={section} className="space-y-4">
+                {templateData.fields
+                  .filter(field => field.section === section)
+                  .map((field) => (
+                    <Card key={field.id} className="shadow-sm">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          {getFieldIcon(field.type)}
+                          {field.label}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-2">
+                          <Label 
+                            htmlFor={field.id} 
+                            className="text-xs text-gray-600 uppercase tracking-wide"
+                          >
+                            {field.type === 'wysiwyg' ? 'Rich Text Editor' : field.type}
+                          </Label>
+                          {renderField(field)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </TabsContent>
+            ))}
+          </Tabs>
+        ) : (
+          <div className="space-y-4">
+            {currentSectionFields.map((field) => (
+              <Card key={field.id} className="shadow-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    {getFieldIcon(field.type)}
+                    {field.label}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-2">
+                    <Label 
+                      htmlFor={field.id} 
+                      className="text-xs text-gray-600 uppercase tracking-wide"
+                    >
+                      {field.type === 'wysiwyg' ? 'Rich Text Editor' : field.type}
+                    </Label>
+                    {renderField(field)}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
