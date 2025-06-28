@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WysiwygEditor } from "@/components/WysiwygEditor";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { TemplateData, TemplateField } from "@/lib/templateData";
 import { Image, Link, Type, Code } from "lucide-react";
 
@@ -49,10 +50,12 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
     switch (field.type) {
       case 'wysiwyg':
         return (
-          <WysiwygEditor
-            {...commonProps}
-            placeholder={field.placeholder}
-          />
+          <ErrorBoundary key={`${field.id}-${activeSection}`}>
+            <WysiwygEditor
+              {...commonProps}
+              placeholder={field.placeholder}
+            />
+          </ErrorBoundary>
         );
       case 'image':
         return (
