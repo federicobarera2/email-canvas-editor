@@ -15,10 +15,12 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
   const renderedHtml = useMemo(() => {
     let html = templateData.htmlTemplate;
     
-    // Replace tokens with field values
+    // Replace regular field tokens with field values
     templateData.fields.forEach(field => {
-      const token = `{{${field.id.toUpperCase().replace('-', '_')}}}`;
-      html = html.replace(new RegExp(token, 'g'), field.value);
+      if (field.type !== 'toggle') {
+        const token = `{{${field.id.toUpperCase().replace(/-/g, '_')}}}`;
+        html = html.replace(new RegExp(token, 'g'), field.value);
+      }
     });
     
     // Handle conditional sections (toggle fields)
@@ -26,25 +28,28 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
       .filter(field => field.type === 'toggle')
       .forEach(toggleField => {
         const isEnabled = toggleField.value === 'true';
-        const sectionId = toggleField.controlsSection?.toUpperCase().replace('-', '_');
+        const toggleToken = toggleField.id.toUpperCase().replace(/-/g, '_');
         
-        if (sectionId) {
-          // Handle Handlebars-style conditionals
-          const conditionalPattern = new RegExp(
-            `{{#${toggleField.id.toUpperCase().replace('-', '_')}}}([\\s\\S]*?){{/${toggleField.id.toUpperCase().replace('-', '_')}}}`,
-            'g'
-          );
-          
-          html = html.replace(conditionalPattern, (match, content) => {
-            console.log(`Toggle ${toggleField.id} is ${isEnabled ? 'enabled' : 'disabled'}`);
-            return isEnabled ? content : '';
-          });
-        }
+        console.log(`Processing toggle: ${toggleField.id}, enabled: ${isEnabled}`);
+        
+        // Handle Handlebars-style conditionals
+        const conditionalStartPattern = new RegExp(`{{#${toggleToken}}}`, 'g');
+        const conditionalEndPattern = new RegExp(`{{/${toggleToken}}}`, 'g');
+        const fullConditionalPattern = new RegExp(
+          `{{#${toggleToken}}}([\\s\\S]*?){{/${toggleToken}}}`,
+          'g'
+        );
+        
+        html = html.replace(fullConditionalPattern, (match, content) => {
+          console.log(`Replacing conditional section for ${toggleField.id}:`, isEnabled ? 'showing' : 'hiding');
+          return isEnabled ? content : '';
+        });
       });
     
     // Replace any remaining common tokens
     html = html.replace(/{{TITLE}}/g, templateData.name);
     
+    console.log('Final rendered HTML:', html);
     return html;
   }, [templateData]);
 
