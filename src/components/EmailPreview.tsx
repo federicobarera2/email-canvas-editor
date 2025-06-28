@@ -1,5 +1,8 @@
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Monitor, Smartphone } from "lucide-react";
 import { TemplateData } from "@/lib/templateData";
 
 interface EmailPreviewProps {
@@ -7,6 +10,8 @@ interface EmailPreviewProps {
 }
 
 export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
+  const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
+
   const renderedHtml = useMemo(() => {
     let html = templateData.htmlTemplate;
     
@@ -22,6 +27,14 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
     return html;
   }, [templateData]);
 
+  const getPreviewWidth = () => {
+    return viewMode === "mobile" ? "375px" : "100%";
+  };
+
+  const getPreviewMaxWidth = () => {
+    return viewMode === "mobile" ? "375px" : "2xl";
+  };
+
   return (
     <div className="h-full flex flex-col">
       {/* Preview Header */}
@@ -31,7 +44,17 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
             <h3 className="text-lg font-semibold text-gray-900">Email Preview</h3>
             <p className="text-sm text-gray-600">Live preview of your email template</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-4">
+            <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "desktop" | "mobile")}>
+              <ToggleGroupItem value="desktop" aria-label="Desktop view">
+                <Monitor className="h-4 w-4" />
+                <span className="ml-2 text-sm">Desktop</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="mobile" aria-label="Mobile view">
+                <Smartphone className="h-4 w-4" />
+                <span className="ml-2 text-sm">Mobile</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
             <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
               Live Preview
             </div>
@@ -41,13 +64,13 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
 
       {/* Preview Content */}
       <div className="flex-1 p-6 bg-gray-100">
-        <div className="max-w-2xl mx-auto">
+        <div className={`mx-auto ${viewMode === "mobile" ? "" : "max-w-2xl"}`} style={{ width: getPreviewWidth() }}>
           {/* Email Client Mockup */}
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ maxWidth: getPreviewMaxWidth() }}>
             {/* Mock Email Header */}
             <div className="bg-gray-50 px-4 py-3 border-b text-sm text-gray-600">
               <div className="flex items-center justify-between mb-1">
-                <span className="font-medium">From: Your Company &lt;hello@yourcompany.com&gt;</span>
+                <span className="font-medium text-xs sm:text-sm">From: Your Company &lt;hello@yourcompany.com&gt;</span>
                 <span className="text-xs">Just now</span>
               </div>
               <div className="text-xs">
@@ -70,11 +93,16 @@ export const EmailPreview = ({ templateData }: EmailPreviewProps) => {
 
           {/* Preview Notes */}
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h4 className="text-sm font-medium text-blue-900 mb-2">Preview Notes</h4>
+            <h4 className="text-sm font-medium text-blue-900 mb-2">
+              Preview Notes {viewMode === "mobile" && "- Mobile View"}
+            </h4>
             <ul className="text-xs text-blue-800 space-y-1">
               <li>• This preview shows how your email will appear to recipients</li>
               <li>• Changes made in the control panel will update this preview in real-time</li>
               <li>• Use the "Send Test" button to see how it looks in actual email clients</li>
+              {viewMode === "mobile" && (
+                <li>• Mobile view simulates a 375px width typical of smartphones</li>
+              )}
             </ul>
           </div>
         </div>

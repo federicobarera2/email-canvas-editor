@@ -14,9 +14,9 @@ interface ControlPanelProps {
 }
 
 export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
-  const [activeSection, setActiveSection] = useState("Header");
-
+  // Dynamically get unique sections from template fields
   const sections = Array.from(new Set(templateData.fields.map(field => field.section)));
+  const [activeSection, setActiveSection] = useState(sections[0] || "Content");
 
   const handleFieldUpdate = (fieldId: string, value: string) => {
     const updatedFields = templateData.fields.map(field =>
@@ -106,7 +106,7 @@ export const ControlPanel = ({ templateData, onUpdate }: ControlPanelProps) => {
 
       <div className="flex-1 p-6">
         <Tabs value={activeSection} onValueChange={setActiveSection}>
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className={`grid w-full mb-6 ${sections.length === 2 ? 'grid-cols-2' : sections.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
             {sections.map((section) => (
               <TabsTrigger key={section} value={section} className="text-xs">
                 {section}
